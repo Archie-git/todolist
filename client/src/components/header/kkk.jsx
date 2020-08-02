@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import Logo from '../../assets/logo2.png';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -12,7 +13,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -121,52 +122,58 @@ export default function Header() {
     );
     
     const mobileMenuId = 'primary-search-account-menu-mobile';
-    const renderMobileMenu = (
-        <Menu
-            anchorEl={mobileMoreAnchorEl}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            id={mobileMenuId}
-            keepMounted
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
-        >
-            <MenuItem>
-                <IconButton aria-label="show 4 new mails" color="inherit">
-                    <Badge badgeContent={4} color="secondary">
-                        <MailIcon />
-                    </Badge>
-                </IconButton>
-                <p>Messages</p>
-            </MenuItem>
-            <MenuItem>
-                <IconButton aria-label="show 11 new notifications" color="inherit">
-                    <Badge badgeContent={11} color="secondary">
-                        <NotificationsIcon />
-                    </Badge>
-                </IconButton>
-                <p>Notifications</p>
-            </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
-                </IconButton>
-                <p>Profile</p>
-            </MenuItem>
-        </Menu>
-    );
+    // const renderMobileMenu = (
+    //     <Menu
+    //         anchorEl={mobileMoreAnchorEl}
+    //         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    //         id={mobileMenuId}
+    //         keepMounted
+    //         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    //         open={isMobileMenuOpen}
+    //         onClose={handleMobileMenuClose}
+    //     >
+    //         <MenuItem>
+    //             <IconButton aria-label="show 4 new mails" color="inherit">
+    //                 <Badge badgeContent={4} color="secondary">
+    //                     <MailIcon />
+    //                 </Badge>
+    //             </IconButton>
+    //             <p>Messages</p>
+    //         </MenuItem>
+    //         <MenuItem>
+    //             <IconButton aria-label="show 11 new notifications" color="inherit">
+    //                 <Badge badgeContent={11} color="secondary">
+    //                     <NotificationsIcon />
+    //                 </Badge>
+    //             </IconButton>
+    //             <p>Notifications</p>
+    //         </MenuItem>
+    //         <MenuItem onClick={handleProfileMenuOpen}>
+    //             <IconButton
+    //                 aria-label="account of current user"
+    //                 aria-controls="primary-search-account-menu"
+    //                 aria-haspopup="true"
+    //                 color="inherit"
+    //             >
+    //                 <AccountCircle />
+    //             </IconButton>
+    //             <p>Profile</p>
+    //         </MenuItem>
+    //     </Menu>
+    // );
+    const history = useHistory();
+    const handleExit = () => {
+        localStorage.removeItem('user_info');
+        history.push('/')
+    };
     
     return (
         <div className={classes.grow}>
-            <AppBar position="static">
+            <AppBar position='fixed'>
                 <Toolbar>
                     <img className={classes.img} src={Logo} alt='logo' />
                     <div className={classes.grow} />
+                    {/*搜索框*/}
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
                             <SearchIcon />
@@ -181,41 +188,34 @@ export default function Header() {
                         />
                     </div>
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <MailIcon />
-                            </Badge>
-                        </IconButton>
-                        <IconButton aria-label="show 17 new notifications" color="inherit">
-                            <Badge badgeContent={17} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
+                        {/*<IconButton aria-label="show 4 new mails" color="inherit">*/}
+                        {/*    <Badge badgeContent={4} color="secondary">*/}
+                        {/*        <MailIcon />*/}
+                        {/*    </Badge>*/}
+                        {/*</IconButton>*/}
+                        {/*<IconButton aria-label="show 17 new notifications" color="inherit">*/}
+                        {/*    <Badge badgeContent={17} color="secondary">*/}
+                        {/*        <NotificationsIcon />*/}
+                        {/*    </Badge>*/}
+                        {/*</IconButton>*/}
+                        
+                        {/*个人中心*/}
                         <IconButton
-                            edge="end"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
                             onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
                             <AccountCircle />
                         </IconButton>
-                    </div>
-                    <div className={classes.sectionMobile}>
+                        {/*退出*/}
                         <IconButton
-                            aria-label="show more"
-                            aria-controls={mobileMenuId}
-                            aria-haspopup="true"
-                            onClick={handleMobileMenuOpen}
+                            onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
-                            <MoreIcon />
+                            <ExitToAppIcon />
                         </IconButton>
                     </div>
                 </Toolbar>
             </AppBar>
-            {renderMobileMenu}
             {renderMenu}
         </div>
     );

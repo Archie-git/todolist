@@ -1,27 +1,24 @@
-import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
+import React, { useState, useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import Footer from '../../components/footer'
+import {
+    Avatar,
+    Button,
+    CssBaseline,
+    TextField,
+    FormControlLabel,
+    Checkbox,
+    Grid,
+    Box,
+    Typography,
+    Container,
+    Snackbar,
+    Slide
+} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import MuiLink from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">Register</Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+import { reqUserAdd } from '../../api/index';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -42,45 +39,77 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
 }));
+function TransitionDown(props) {
+    return <Slide {...props} direction="down" />;
+}
 
-export default function SignUp() {
+export default function Register() {
     const classes = useStyles();
-    
+    const history = useHistory();
+    const [submitDisabled, setDisabled] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [alertVisible, setVisible] = useState(false);
+    const [alertContent, setContent] = useState({type: 'success', info: 'success'});
+    let timerID;
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        reqUserAdd({email, password}).then(res => {
+            setContent({type: 'success', info: res.msg});
+            setVisible(true);
+            timerID = setTimeout(() => {
+                setVisible(false);
+                history.push('/login');
+            }, 2000);
+        }, err => {
+            setContent({type: 'error', info: err.errMsg});
+            setVisible(true);
+            timerID = setTimeout(() => {
+                setVisible(false);
+            }, 2000)
+        });
+    };
+    useEffect(() => {
+        return () => {
+            clearTimeout(timerID)
+        }
+    });
     return (
         <Container component="main" maxWidth="xs">
+            <Snackbar
+                open={alertVisible}
+                anchorOrigin={{horizontal: 'center', vertical: 'top'}}
+                TransitionComponent={TransitionDown}
+                autoHideDuration={6000}
+            >
+                <Alert severity={alertContent.type} variant='filled'>{alertContent.info}</Alert>
+            </Snackbar>
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar} />
                 <Typography component="h1" variant="h5">
                     用户注册
                 </Typography>
-                <form className={classes.form} noValidate>
+                <form className={classes.form} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
                                 variant="outlined"
-                                required
-                                fullWidth
-                                id="nickname"
-                                label="昵称"
-                                name="nickname"
-                                autoComplete="nickname"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                variant="outlined"
+                                size="small"
                                 required
                                 fullWidth
                                 id="email"
                                 label="邮箱地址"
                                 name="email"
                                 autoComplete="email"
+                                value={email}
+                                onChange={(e)=>{setEmail(e.target.value)}}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 variant="outlined"
+                                size="small"
                                 required
                                 fullWidth
                                 name="password"
@@ -88,11 +117,18 @@ export default function SignUp() {
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
+                                value={password}
+                                onChange={(e)=>{setPassword(e.target.value)}}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <FormControlLabel
-                                control={<Checkbox value="allowExtraEmails" color="primary" />}
+                                control={
+                                    <Checkbox
+                                        value="allowExtraEmails"
+                                        color="primary"
+                                        onChange={()=>{setDisabled(!submitDisabled)}}
+                                    />}
                                 label="我接受MyDiary的隐私条款"
                             />
                         </Grid>
@@ -103,20 +139,23 @@ export default function SignUp() {
                         variant="contained"
                         color="primary"
                         className={classes.submit}
+                        disabled={submitDisabled}
                     >
                         注册
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <Link href="#" variant="body2">
-                                已有账号？立即登录
+                            <Link to='/login'>
+                                <MuiLink component='button'>
+                                    已有账号？立即登录
+                                </MuiLink>
                             </Link>
                         </Grid>
                     </Grid>
                 </form>
             </div>
             <Box mt={5}>
-                <Copyright />
+                <Footer />
             </Box>
         </Container>
     );
